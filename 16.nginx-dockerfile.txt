@@ -1,0 +1,72 @@
+Deploy Web App (nginx) via Minimal Dockerfile
+
+Step 1: Create Project Files
+Create Directory & Files:
+
+Bash
+mkdir myapp
+cd myapp
+nano index.html
+code:
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Docker App</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background-color: #2b3e50; 
+            color: #ffffff;
+            text-align: center;
+            padding-top: 100px;
+        }
+        h1 { 
+            font-size: 3em;
+            text-shadow: 2px 2px 4px #000;
+        }
+        p {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My First Dockerized App!</h1>
+    <p>This page is being served by Nginx from a custom image.</p>
+</body>
+</html>
+
+Save & Exit (Ctrl+O, Enter, Ctrl+X).
+
+Bash
+nano Dockerfile
+
+Dockerfile code:
+
+FROM nginx
+COPY index.html /usr/share/nginx/html
+
+Step 2: Ensure Docker is Running
+(Optional check)
+
+Bash
+
+sudo systemctl status docker
+If it's not active, start it: sudo systemctl start docker
+
+Step 3: Build the Docker Image
+Make sure you're in the myapp folder.
+
+Bash
+docker build -t myapp .
+
+Step 4: Run the Docker Container
+
+Bash
+
+docker run -d -p 8083:80 myapp
+
+Step 5: Verify
+Open your browser.
+
+Go to http://localhost:8083.

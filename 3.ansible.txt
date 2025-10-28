@@ -1,0 +1,161 @@
+Step 1: Install Ansible on Your VirtualBox
+
+First, we need to install the Ansible software on your main machine (your VirtualBox).
+
+    Open your terminal.
+
+    Update your system's package list:
+    Bash
+
+sudo apt update
+
+Install Ansible:
+Bash
+
+sudo apt install ansible -y
+
+Verify it's installed. You should see a version number:
+Bash
+
+    ansible --version
+
+Step 2: Set Up Your Project Folder
+
+Let's create a clean folder for our experiment.
+
+    Go to your Desktop (or anywhere you like):
+    Bash
+
+cd ~/Desktop
+
+Create a project folder and move into it:
+Bash
+
+    mkdir ansible-deploy
+    cd ansible-deploy
+
+You are now in ~/Desktop/ansible-deploy. We will create 3 files in this folder.
+
+Step 3: Create Your 3 Project Files
+
+File 1: The index.html (Your Web Page)
+
+This is the file content you provided.
+
+    Create the file:
+    Bash
+
+gedit index.html
+
+Copy and paste this HTML content into the text editor. Save and close the file.
+HTML
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Welcome to My Ansible Deployed Site</title>
+    </head>
+    <body style="text-align:center; font-family:sans-serif;">
+    <h1> Deployment Successful!</h1>
+    <p>This web page was deployed using Ansible Playbook by Ismaeel Shaikh.</p>
+    </body>
+    </html>
+
+File 2: The inventory.ini (The "Who to Control")
+
+This file is our "contact list." We need to tell Ansible which computer to manage.
+
+    Create the file:
+    Bash
+
+gedit inventory.ini
+
+Copy and paste this content. This is a special trick that tells Ansible, "The computer to manage is localhost (this machine itself), and you don't need to use SSH."
+Ini, TOML
+
+    [webservers]
+    localhost ansible_connection=local
+
+    Save and close the file.
+
+File 3: The deploy.yml (The "To-Do List")
+
+This is the Playbook—our main instruction script. It's written in YAML, which is very strict about spacing. Make sure the indentation (spaces) is exactly as shown below.
+
+    Create the file:
+    Bash
+
+gedit deploy.yml
+
+Copy and paste this exactly as it is:
+YAML:
+
+    ---
+    - hosts: webservers
+      become: yes
+      tasks:
+
+      - name: 1. Install Nginx web server
+        apt:
+          name: nginx
+          state: present
+          update_cache: yes
+
+      - name: 2. Copy the index.html file
+        copy:
+          src: index.html
+          dest: /var/www/html/index.html
+
+      - name: 3. Start the Nginx service
+        service:
+          name: nginx
+          state: started
+
+    Save and close the file.
+
+What this "To-Do List" says:
+
+    hosts: webservers: Run this list on all computers in the [webservers] group from our inventory.
+
+    become: yes: This means "Do these tasks as a super-user" (using sudo). This is required to install software.
+
+    tasks:
+
+        Install Nginx: Uses the apt module to install the nginx package.
+
+        Copy the file: Uses the copy module to copy our index.html (the src) to the Nginx web folder dest.
+
+        Start the service: Uses the service module to make sure Nginx is running.
+
+Step 4: Run Your Ansible Playbook! 🚀
+
+You are now in your ansible-deploy folder, which contains your 3 files. It's time to run the magic command!
+Bash
+
+ansible-playbook -i inventory.ini deploy.yml
+
+    ansible-playbook: The command to run a playbook.
+
+    -i inventory.ini: Use (i)nventory file inventory.ini.
+
+    deploy.yml: The name of the playbook to run.
+
+You will see Ansible run through each task. The output will be colored:
+
+    Green (ok): The task ran, and everything was already correct.
+
+    Yellow (changed): Ansible made a change (e.g., it installed Nginx or copied the file).
+
+    Red (failed): An error occurred.
+
+You should see "changed" for all three tasks, followed by a summary.
+
+Step 5: Verify Your Success!
+
+You're done! Ansible has installed a web server and deployed your file.
+
+    Open the Firefox browser inside your VirtualBox.
+
+    In the address bar, type http://localhost and press Enter.
+
+You should see your webpage!

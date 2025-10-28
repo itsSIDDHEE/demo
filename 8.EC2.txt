@@ -1,0 +1,229 @@
+Part 1: Create Your AWS EC2 Instance (Your Virtual Server)
+
+This is the virtual computer in the cloud where Jenkins will live.
+
+    Log in to AWS: Go to the AWS Management Console and log in.
+
+    Navigate to EC2: In the search bar, type "EC2" and select it from the results.
+
+    Launch Instance: Click the "Launch instance" button.
+
+    Name Your Instance: In the "Name" field, give it an easy-to-remember name, like Jenkins-Server.
+
+    Choose an AMI (Operating System):
+
+        Select Ubuntu.
+
+        Make sure the "Amazon Machine Image (AMI)" dropdown shows an Ubuntu Server LTS version (like 22.04 or 20.04). It should be marked "Free tier eligible."
+
+    Choose an Instance Type:
+
+        Select t2.micro. This is crucial as it's part of the AWS Free Tier, so you won't be charged (within limits).
+
+    Create a Key Pair (Your Server's Password):
+
+        This is how you'll securely connect to your server.
+
+        Click "Create new key pair".
+
+        Key pair name: jenkins-key
+
+        Key pair type: RSA
+
+        Private key file format:
+
+            Select .pem if you are on Mac or Linux.
+
+            Select .ppk if you are on Windows using PuTTY.
+
+        Click "Create key pair". Your browser will immediately download this file (e.g., jenkins-key.pem). Guard this file! You cannot download it again.
+
+    Configure Network Settings (Firewall):
+
+        Click the "Edit" button next to "Network settings."
+
+        You'll see a "Security group" section. This is your server's firewall.
+
+        Find the "Inbound security groups rules" section.
+
+        By default, it might have a rule for SSH (port 22). This is correct.
+
+        Source type: For the SSH rule, change "Anywhere" to "My IP". This is much more secure and means only your computer can connect to the server's terminal.
+
+        We will add the Jenkins port (8080) later, just as you planned.
+
+    Launch:
+
+        Leave "Configure storage" at the default (8GB is fine).
+
+        Review the summary and click "Launch instance".
+
+Part 2: Connect to Your Instance via SSH
+
+Now you'll connect to your new server's command line.
+
+    Go to Instances: Click "View all instances." Wait until your Jenkins-Server instance state says "Running" and "Status check" is "2/2 checks passed".
+
+    Get Connection Info: Select your instance by checking the box next to it. At the top, click the "Connect" button.
+
+    Select SSH Client: Click the "SSH client" tab.
+
+    Open Your Terminal:
+
+        Mac/Linux: Open the "Terminal" app.
+
+        Windows: Open "Command Prompt," "PowerShell," or (recommended) "Git Bash."
+
+    Run the Commands:
+
+        Navigate to your key: Your downloaded .pem file is probably in your "Downloads" folder. In your terminal, type cd ~/Downloads (or wherever you saved the key).
+
+        Set permissions: Copy the chmod command from the AWS page (it will look like chmod 400 jenkins-key.pem). This locks the file so only you can read it.
+
+        Connect: Copy the example ssh command (e.g., ssh -i "jenkins-key.pem" ubuntu@ec2-xx-xx-xx-xx.compute-1.amazonaws.com) and paste it into your terminal. Press Enter.
+
+    Approve Connection: The first time you connect, it will ask, "Are you sure you want to continue connecting (yes/no)?" Type yes and press Enter.
+
+You are now logged into your Ubuntu server! The prompt will change to something like ubuntu@ip-172-xx-xx-xx:~$.
+
+Part 3: Install Java
+
+Jenkins is a Java application, so it needs the Java Runtime Environment (JRE) to run.
+
+    Update Package Lists: This command downloads the latest list of available software.
+    Bash
+
+sudo apt update
+
+Install OpenJDK 11: This command installs the Java Development Kit, version 11 (a stable, long-term support version that works perfectly with Jenkins). The -y flag automatically says "yes" to the installation.
+Bash
+
+sudo apt install openjdk-11-jdk -y
+
+Verify Installation: Check that Java is correctly installed.
+Bash
+
+    java -version
+
+    You should see output that says "openjdk version 11.x.x".
+
+Part 4: Install Jenkins
+
+Now you'll add the official Jenkins software repository and install it.
+
+    Add the Jenkins GPG Key: This key verifies that the software you're downloading is authentic and from the real Jenkins project.
+    Bash
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+Add the Jenkins Repository: This command tells your server where to find the Jenkins software packages.
+Bash
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+Update Package Lists Again: You must run update again so your server reads the new Jenkins repository you just added.
+Bash
+
+sudo apt-get update
+
+Install Jenkins: Finally, install Jenkins itself!
+Bash
+
+    sudo apt-get install jenkins -y
+
+Part 5: Start and Enable Jenkins Service
+
+Jenkins is installed, but it's not running yet.
+
+    Start the Service: This command starts the Jenkins service right now.
+    Bash
+
+sudo systemctl start jenkins
+
+Enable the Service: This command tells the server to automatically start Jenkins every time the server reboots. This is very important!
+Bash
+
+sudo systemctl enable jenkins
+
+Check the Status: Let's make sure it's running properly.
+Bash
+
+    sudo systemctl status jenkins
+
+    You should see text in green that says active (running). Press q to exit the status view.
+
+Part 6: Open the Firewall (Port 8080)
+
+Jenkins is running, but your AWS firewall (the Security Group) is still blocking access. You need to open port 8080.
+
+    Go to EC2 Security Groups: Go back to your AWS Console tab. You can either:
+
+        Go to the EC2 Instances page, select your Jenkins-Server, and click the "Security" tab below.
+
+        Click the link for the security group (e.g., sg-0123...).
+
+    Edit Inbound Rules: In the security group's page, find the "Inbound rules" tab and click "Edit inbound rules".
+
+    Add the Jenkins Rule:
+
+        Click "Add rule".
+
+        Type: Select "Custom TCP".
+
+        Port range: Type 8080.
+
+        Source: Select "Anywhere (0.0.0.0/0)". This lets anyone on the internet access your Jenkins page. (For better security, you could also select "My IP").
+
+    Save Rules: Click the "Save rules" button.
+
+Part 7: Unlock Jenkins in Your Browser
+
+Now for the final setup!
+
+    Get Your Server's IP: Go back to the EC2 Instances page. Select your Jenkins-Server and look in the "Details" tab for the "Public IPv4 address". Copy this address.
+
+    Open Jenkins in Browser: Open a new browser tab and go to: http://<YOUR_PUBLIC_IPV4_ADDRESS>:8080 (Replace <YOUR_PUBLIC_IPV4_ADDRESS> with the IP you just copied).
+
+    Unlock Jenkins: You will see an "Unlock Jenkins" screen asking for an administrator password.
+
+    Get the Password: The page tells you the password is in a file on your server.
+
+        Go back to your SSH terminal.
+
+        Type the following command to display the password:
+        Bash
+
+        sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+    Copy and Paste: A long string of letters and numbers will appear in your terminal. Copy this string.
+
+    Continue: Paste the password into the "Administrator password" box in your browser and click "Continue".
+
+Part 8: Final Configuration
+
+You're on the home stretch!
+
+    Install Plugins: You'll be asked to customize Jenkins. Click the big button for "Install suggested plugins".
+
+    This will take a few minutes as Jenkins downloads and installs all the standard, essential plugins.
+
+    Create Admin User: Once the plugins are installed, you'll be asked to create your first admin user.
+
+        Fill in your username, password, full name, and email address.
+
+        Do not skip this! This is the account you will use to log in from now on.
+
+        Click "Save and Continue".
+
+    Instance Configuration: The next page will ask for the "Jenkins URL". It should already be filled in with your IP address (e.g., http://xx.xx.xx.xx:8080/). This is correct.
+
+        Click "Save and Finish".
+
+    All Done! You will see a "Jenkins is ready!" page.
+
+        Click "Start using Jenkins".
+
+Congratulations! You will be taken to your new Jenkins dashboard. You have successfully installed and configured Jenkins on an AWS EC2 instance. 🎉

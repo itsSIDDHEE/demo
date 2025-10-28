@@ -1,0 +1,27 @@
+sudo su - Become root user
+apt update - Update package lists
+apt-get install git - Install Git software
+git --version - Check Git version
+git config --global user.name "YourGitHubUsername" - Set your Git username
+git config --global user.email your.email@example.com - Set your Git email
+git config --list - Show Git configuration
+git init - Initialize local repository (Usually not needed if cloning)
+ls -altr - List files (detailed)
+git clone https://github.com/YourUsername/<your-repo-name>.git - Download remote repository
+ls -altr - List files again
+cd <your-repo-name> - Enter repository folder
+ls - List files in repo
+cat README.md - View README file content (If it exists)
+git status - Check repo changes status
+git add . - Stage all new/changed files
+git status - Check status again
+git commit -m "Added file, my commit" - Save changes locally
+git push origin main - Upload local commits (Use master if that's your branch)--> If push fails (e.g., authentication):
+git remote set-url origin https://<YOUR_TOKEN>@github.com/YourUsername/<your-repo-name>.git - Set remote URL with token
+git push origin main - Try uploading again -->Back in your repository folder:
+ls -altr - List files (detailed)
+git pull - Download remote changes
+ls -altr - List files again
+git log - Show detailed commit history
+git log --oneline - Show short commit history
+git show <commit-hash-id> - Show details of one commit

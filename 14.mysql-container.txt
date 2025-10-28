@@ -1,0 +1,24 @@
+Setup MySQL Database Inside Docker
+
+Step 1: Pull the MySQL Image
+Bash
+docker pull mysql:latest
+
+Step 2: Run the MySQL Container
+Bash
+
+docker run --name test-name -e MYSQL_ROOT_PASSWORD=1234 -d mysql:latest
+
+Step 3: Access the Container's Shell
+Get an interactive bash shell (-it) inside the running container named test-alok.
+
+Bash
+docker exec -it test-name bash
+
+Step 4: Log in to MySQL (Inside Container Shell)
+Bash
+mysql -u root -p
+
+Step 5: Verify (Inside MySQL Shell)
+show databases;
+

@@ -1,0 +1,34 @@
+7. Java Addition in Docker
+
+create a folder and perform all these inside it 
+Step 1: Create Files
+Addition.java:
+
+Java
+
+public class Addition {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 25;
+        System.out.println("Sum is: " + (a + b));
+    }
+}
+Dockerfile:
+
+Dockerfile
+
+FROM openjdk:11-jdk
+WORKDIR /app
+COPY Addition.java .
+RUN javac Addition.java
+CMD ["java", "Addition"]
+
+Step 2: Build Image (Terminal)
+Make sure you're in the same folder as the files.
+
+Bash
+docker build -t addition-java-app .
+Step 3: Run Container (Terminal)
+Bash
+
+docker run addition-java-app

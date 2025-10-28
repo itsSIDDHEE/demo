@@ -1,0 +1,48 @@
+Jenkins Job: Java HelloWorld from Git (Simple)
+
+Step A: Run Jenkins (Docker)
+sudo su
+
+docker pull jenkins/jenkins:lts
+
+docker run -d -p 8080:8080 -p 50000:50000 --name myjenkins jenkins/jenkins:lts
+
+Step B: Jenkins First Time Setup
+Get password: docker exec myjenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+Open browser: http://localhost:8080
+
+Paste password -> Continue
+
+Click "Install suggested plugins" -> Wait
+
+Create Admin User -> Save and Continue
+
+Save and Finish -> Start using Jenkins
+
+Step C: GitHub Prep
+
+Make sure your HelloWorld.java is in a GitHub repo.
+
+Copy the HTTPS URL of that repo.
+
+Step D: Jenkins Job
+New Item -> Name: HelloGitJob -> Freestyle project -> OK
+
+Source Code Management -> Git -> Paste Repository URL.
+
+Build Steps -> Add build step -> Execute shell
+
+Inside Command box, type:
+
+Bash
+
+javac YourFileName.java
+java YourFileName
+(Use your actual Java file name)
+
+Apply -> Save
+
+Build Now
+
+Check Build History -> #1 -> Console Output for success.

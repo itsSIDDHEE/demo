@@ -1,0 +1,68 @@
+1.Automate Form Filling Using Selenium (on Ubuntu)
+Goal: Run a Python script that opens Chrome, fills a web form, and submits it.
+
+Step 1: Install All Requirements (Terminal)
+Run these 4 commands one by one. This is the most important step to prevent errors.
+
+Update Ubuntu's package list:
+
+Bash
+sudo apt update
+Install pip (the Python installer):
+
+Bash
+sudo apt install python3-pip
+Install the chromedriver (the "remote control" for Chrome):
+
+Bash
+sudo apt install chromium-chromedriver
+Install selenium (the Python library):
+
+Bash
+pip3 install selenium
+(If you run these, you will not get the ModuleNotFoundError)
+
+Open VScode
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+
+# Initialize Chrome driver
+driver = webdriver.Chrome()
+
+# Step 1: Open form page
+driver.get("https://www.w3schools.com/html/html_forms.asp")
+driver.maximize_window()
+
+# Step 2: Find input fields by ID
+fname = driver.find_element(By.ID, "fname")
+lname = driver.find_element(By.ID, "lname")
+
+# Step 3: Clear and fill the form fields
+fname.clear()
+fname.send_keys("Alok")  # Use your name
+
+lname.clear()
+lname.send_keys("Sahoo") # Use your last name
+
+# Step 4: Find and click Submit button
+driver.find_element(By.XPATH, "//input[@type='submit']").click()
+
+# Step 5: Wait and print the new URL
+time.sleep(5)
+print("Form submitted successfully!")
+print("Redirected URL:", driver.current_url)
+
+# Step 6: Close browser
+driver.quit()
+
+Step 3: Run Your Script (Terminal)
+Make sure you are in the same folder as your selenium_form.py file.
+
+Bash
+python3 selenium_form.py
+
+
+

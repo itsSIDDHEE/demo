@@ -1,0 +1,79 @@
+1.Automate Form Filling Using Selenium (on Ubuntu)
+Goal: Run a Python script that opens Chrome, fills a web form, and submits it.
+
+Step 1: Install All Requirements (Terminal)
+Run these 4 commands one by one. This is the most important step to prevent errors.
+
+Update Ubuntu's package list:
+
+Bash
+sudo apt update
+Install pip (the Python installer):
+
+Bash
+sudo apt install python3-pip
+Install the chromedriver (the "remote control" for Chrome):
+
+Bash
+sudo apt install chromium-chromedriver
+Install selenium (the Python library):
+
+Bash
+pip3 install selenium
+(If you run these, you will not get the ModuleNotFoundError)
+
+if unable to download selenium from above command use this
+
+1. sudo apt install python3.12-venv
+
+2. python3 -m venv venv
+
+3. source venv/bin/activate
+
+4. pip3 install selenium
+
+Open VScode
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
+
+# Initialize Chrome driver
+driver = webdriver.Chrome()
+
+# Step 1: Open Wikipedia homepage
+driver.get("https://www.wikipedia.org/")
+driver.maximize_window()
+
+# Step 2: Find the search input field by ID
+search_box = driver.find_element(By.ID, "searchInput")
+
+# Step 3: Clear and fill the search box
+search_box.clear()
+search_box.send_keys("DevOps")
+
+# Step 4: Press Enter to search
+search_box.send_keys(Keys.RETURN)
+
+print("Searching Wikipedia...")
+time.sleep(5)
+
+# Step 5: Extract and print the page title
+page_title = driver.title
+print("\nWikipedia Page Title:", page_title)
+
+print("\nSearch completed successfully!")
+print("Current URL:", driver.current_url)
+
+# Step 6: Close the browser
+driver.quit()
+
+Step 3: Run Your Script (Terminal)
+Make sure you are in the same folder as your wiki.py file.
+
+Bash
+python3 wiki.py
+
+
+

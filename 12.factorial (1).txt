@@ -1,0 +1,71 @@
+Install Jenkins & Execute Factorial
+
+Step A: Install Jenkins (If not already done)
+
+	Step A: Run Jenkins (Docker)
+	sudo su
+
+	docker pull jenkins/jenkins:lts
+
+	docker run -d -p 8080:8080 -p 50000:50000 --name myjenkins jenkins/jenkins:lts
+
+	Step B: Jenkins First Time Setup
+	Get password: docker exec myjenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+	Open browser: http://localhost:8080
+
+Step B: Prepare GitHub Repo
+Create a Java file named Factorial.java (you can use the code from Question 5).
+
+Java
+
+// Factorial.java
+public class Factorial {
+    public static void main(String[] args) {
+        int n = 5; 
+        int result = 1;
+        for (int i = 1; i <= n; i++) {
+            result = result * i;
+        }
+        System.out.println("Factorial of " + n + " is: " + result);
+    }
+}
+Push this Factorial.java file to a new GitHub repository.
+
+Copy the HTTPS URL of that repository.
+
+Step C: Create Jenkins Job
+New Item:
+
+Jenkins Dashboard → + New Item.
+
+Enter Name: Factorial-Git-Job.
+
+Select Freestyle project.
+
+Click OK.
+
+Configure Git:
+
+Source Code Management tab → Select Git.
+
+Paste your Factorial project's Repository URL.
+
+Configure Build:
+
+Build Steps tab → Add build step → Execute shell.
+
+Enter commands :
+
+Bash
+
+javac Factorial.java
+java Factorial
+Save:
+
+Apply → Save.
+
+Step D: Run and Check
+Build Now: Click Build Now on the job page.
+
+Check Output: Go to Build History → #1 → Console Output.

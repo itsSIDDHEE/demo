@@ -1,0 +1,63 @@
+Demonstrate "Factorial of a Number"
+Step 1: Create Your Project Files
+
+Bash
+mkdir factorial-java-docker
+cd factorial-java-docker
+
+Create the Java File:
+Run this command to open a text editor. The file name must be fact.java.
+
+Bash
+gedit fact.java
+
+
+Java
+
+public class fact {
+    public static void main(String[] args) {
+        int number = 5; 
+        int result = 1;
+        for (int i = 1; i <= number; i++) {
+            result *= i; 
+        }
+
+        System.out.println("Factorial of " + number + " is: " + result);
+    }
+}
+
+Create the Dockerfile:
+Run this command in the same folder:
+Bash
+gedit Dockerfile
+
+Dockerfile
+
+# Use an official OpenJDK (Linux) base image
+FROM openjdk:11-jdk
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Java source file from your PC into the container
+COPY fact.java .
+
+# Run the Java compiler inside the container
+RUN javac fact.java
+
+# Set the default command to run when the container starts
+# This MUST match your class name "fact"
+CMD ["java", "fact"]
+
+
+Step 2: Build the Docker Image
+Build the image from your Dockerfile.
+
+Bash
+docker build -t factorial-java-app .
+
+Step 3: Run the Docker Container
+Run the image you just built.
+
+Bash
+docker run factorial-java-app

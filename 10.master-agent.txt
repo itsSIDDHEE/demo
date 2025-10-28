@@ -1,0 +1,122 @@
+10. Jenkins Master & Agent 
+Step 1: Prepare (Terminal)
+Bash
+
+# Install Java (if not already)
+sudo apt update && sudo apt install default-jdk -y
+
+# Create Agent Directory (use your username)
+mkdir -p /home/ubuntu/jenkins-agent-work  --change ubuntu with your user name
+Step 2: Configure Jenkins (Web UI)
+Go to Manage Jenkins → Nodes → New Node.
+
+Name: local-agent.
+
+Select Permanent Agent. Click Create.
+
+Remote root directory: /home/ubuntu/jenkins-agent-work.
+
+Labels: local-agent.
+
+Launch method: Launch agent via execution of command on the controller.  for this we need to install plugin that is "Command Agent Launcher"
+
+Save.
+
+Step 3: Launch Agent (Web UI)
+Go to Manage Jenkins → Nodes.
+
+Click local-agent.
+
+Click Launch agent.
+
+(Wait a few seconds, refresh Nodes page to see connection).
+
+Step 4: Create & Run Test Job (Web UI)
+Go to Dashboard → New Item.
+
+Name: LocalAgentTest, select Freestyle project, click OK.
+
+General Tab:
+
+Check Restrict where this project can be run.
+
+Label Expression: local-agent.
+
+Build Steps Tab:
+
+Add build step → Execute shell.
+
+Command: echo "Hello from Local Agent!".
+
+Apply → Save.
+
+Build Now.
+
+Step 5: Verify (Web UI)
+Go to Build History → #1 → Console Output.
+
+Look for Running on local-agent... and Hello from Local Agent!.
+
+Look for Finished: SUCCESS.
+
+
+for generating launch command we need to do this
+
+Here is the command you need.
+
+However, based on the logs you sent, your Jenkins setup is **running as the `root` user** (your Jenkins home is `/root/.jenkins/`). This changes where you should store your agent files.
+
+Please follow these **exact steps**.
+
+### **Step 1: Download `agent.jar` to your Jenkins Home**
+
+Run this command **on your server (codee-VirtualBox)** to download the agent file into the *correct* directory that your Jenkins setup is using.
+
+```bash
+# This downloads the agent.jar file into your /root/.jenkins/ directory
+sudo wget http://localhost:8080/jnlpJars/agent.jar -O /root/.jenkins/agent.jar
+```
+
+### **Step 2: Create the Secret File in your Jenkins Home**
+
+1.  In your Jenkins web browser, go to **Manage Jenkins** → **Nodes** → click your agent's name (e.g., `local-agent`).
+2.  You will see a long secret key on the page. Copy that key.
+3.  Run this command **on your server**, pasting your secret key inside the quotes:
+
+<!-- end list -->
+
+```bash
+# This creates the secret file in the correct directory
+sudo bash -c 'echo "PASTE_YOUR_LONG_SECRET_KEY_HERE" > /root/.jenkins/agent-secret'
+```
+
+### **Step 3: Your Final Launch Command**
+
+Now, go back to your Jenkins agent configuration page:
+**Manage Jenkins** → **Nodes** → **local-agent** → **Configure**
+
+In the **`Command`** text box, paste this **exact command**:
+
+```bash
+java -jar /root/.jenkins/agent.jar -jnlpUrl http://localhost:8080/computer/local-agent/jenkins-agent.jnlp -secret @/root/.jenkins/agent-secret -workDir /home/codee/jenkins-agent-work
+```
+
+-----
+
+### **Final Checklist (If it Fails)**
+
+If the agent still won't connect, check these two things:
+
+1.  **Is your Node Name `local-agent`?**
+    In the command above, the URL has `/computer/local-agent/`. If you named your node something different (like `my-agent`), you **must** change the URL to match it.
+    *Example:* `/computer/my-agent/jenkins-agent.jnlp`
+
+2.  **Does `/home/codee/jenkins-agent-work` exist?**
+    The command will try to use this folder. Let's make sure it exists first.
+
+    ```bash
+    # Run this on your server to create the directory
+    mkdir -p /home/codee/jenkins-agent-work
+    ```
+
+After saving the configuration with the new command, click **"Bring this agent back online"** (or "Disconnect" then "Launch agent") on the agent's status page to make Jenkins try again.

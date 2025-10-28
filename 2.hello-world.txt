@@ -1,0 +1,63 @@
+2. Demonstrate "Hello World" Java Application (Proper Dockerfile Method)
+
+Step 1: Create a Project Directory
+Bash
+mkdir hello-java-docker
+cd hello-java-docker
+(Your mkdir my-java-app is also perfectly fine)
+
+Step 2: Create the Java File
+Important: The file name HelloWorld.java must match the class name public class HelloWorld.
+
+Bash
+gedit HelloWorld.java
+Paste this code inside:
+
+Java
+
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+
+You do not need to run javac! We will let Docker do that.
+
+Step 3: Create the Dockerfile
+Bash
+
+gedit Dockerfile
+Paste this new Dockerfile code inside. Read the comments to see what it's doing.
+
+Dockerfile
+
+# This Dockerfile compiles AND runs the code.
+
+# 1. Start from an image that has the Java Developer Kit (JDK)
+FROM openjdk:11-jdk
+
+# 2. Set the working directory inside the container
+WORKDIR /app
+
+# 3. Copy the .java SOURCE file (not .class) from your PC
+COPY HelloWorld.java .
+
+# 4. Run the Java compiler *inside* the container
+RUN javac HelloWorld.java
+
+# 5. Set the command to run when the container starts
+CMD ["java", "HelloWorld"]
+
+first write command sudo su to --> root
+
+Step 4: Build the Docker Image
+This step now runs javac inside the build process.
+
+Bash
+docker build -t hello-world-java .
+Step 5: Run the Docker Container
+This is the same as your command.
+
+Bash
+docker run hello-world-java
+
